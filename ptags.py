@@ -70,7 +70,7 @@ def get_tags_for(pat, textmate=False):
     return tags
 
 
-def write_tags(tagfile, textmate=False)
+def write_tags(tagfile, textmate=False):
     with open(tagfile, 'w') as f:
         tags = get_tags_for('*.p')
         tags = tags + get_tags_for('*.md')
