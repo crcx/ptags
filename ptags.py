@@ -43,6 +43,15 @@ def get_tags_for(pat, textmate=False):
     return tags
 
 
+def write_tags(tagfile, textmate=False)
+    with open(tagfile, 'w') as f:
+        tags = get_tags_for('*.p')
+        tags = tags + get_tags_for('*.md')
+        for l in sorted(tags):
+            f.write(l + '\n')
+    return len(tags)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='ctags for parable')
     parser.add_argument('--ctags', help='generate vim compatible tags', action="store_true")
@@ -50,19 +59,10 @@ if __name__ == '__main__':
     args = vars(parser.parse_args())
 
     if args['ctags']:
-        with open('tags', 'w') as f:
-            tags = get_tags_for('*.p')
-            tags = tags + get_tags_for('*.md')
-            for l in sorted(tags):
-                f.write(l + '\n')
-            print(str(len(tags)) + ' words found')
+        write_tags('tags')
 
     if args['tmtags']:
-        with open('tmtags', 'w') as f:
-            tags = get_tags_for('*.p', textmate=True)
-            tags = tags + get_tags_for('*.md', textmate=True)
-            for l in sorted(tags):
-                f.write(l + '\n')
+        write_tags('tmtags', textmate=True)
 
     if not args['ctags'] and not args['tmtags']:
         print('Specify tags format!')
