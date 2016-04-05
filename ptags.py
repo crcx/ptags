@@ -1,7 +1,35 @@
 #!/usr/bin/env python3
 
-# ptags.py
-# Generate a ctags compatible tags file for Parable
+# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+# generate a ctags compatible tags file for parable
+#
+# constraints:
+#
+# - code can be in either a *.p or *.md file
+#    - in *.p, everything is code
+#    - in *.md, code either has four spaces at the start of the line or
+#      is fenced with four backticks (````)
+# - syntax for naming a function is ... complicated
+#    - basic form:
+#      [ ... ] 'name' :
+#    - alternate form:
+#      'name' [ ... ] .
+#    - variable forms:
+#      'name' var
+#
+#      ... 'name' var!
+#
+#      [ 'name' 'name2' 'name3' ... ] ::
+#    - functions can span multiple source lines:
+#      'hello' [ "-s" \
+#          'hello world!' ] .
+# - tag file formats
+#   - classic ctags (for vim):
+#      tag  filename  line#
+#   - textmate requires:
+#      tag  filename  /^search_string$/;"  function  line:line#
+#   - replace the separators with a single tab
+#   - 
 
 import argparse
 import fnmatch
@@ -12,7 +40,6 @@ def tag(tag, file, line, textmate):
         return tag + '\t' + os.getcwd() + '/' + file[2:] + '\t' + '/^\'' + tag + '\'$/;"\tfunction\tline:' + str(line)
     else:
         return tag + '\t' + os.getcwd() + '/' + file[2:] + '\t' + str(line)
-
 
 def tag_for_colon(l, f, i, textmate):
     t = l.split(' ')
