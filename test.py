@@ -34,6 +34,33 @@ import fnmatch
 import os
 
 
+def is_form1(l):
+    flag = False
+    if l.endswith('\' :\n'):
+        flag = True
+    return flag
+
+def is_form2(l):
+    flag = False
+    if l.strip().startswith('\'') and l.endswith(' .\n'):
+        flag = True
+    return flag
+
+def is_form3(l):
+    flag = False
+    if l.strip().startswith('\'') and l.endswith(' var\n'):
+        flag = True
+    if l.strip().startswith('\'') and l.endswith(' var!\n'):
+        flag = True
+    return flag
+
+def is_form4(l):
+    flag = False
+    if l.strip().startswith('[ \'') and l.endswith(' ::\n'):
+        flag = True
+    return flag
+
+
 def get_tags_for(pat, textmate=False):
     tags = []
     matches = []
@@ -45,8 +72,14 @@ def get_tags_for(pat, textmate=False):
         s = open(f, 'r').readlines()
         i = 1
         for l in s:
-            if l.endswith('\' :\n'): tags.append((l, f, i))
-            if l.strip().startswith('\'') and l.endswith(' .\n'): tags.append((l, f, i))
+            if is_form1(l):
+                tags.append((1, l, i, f))
+            if is_form2(l):
+                tags.append((2, l, i, f))
+            if is_form3(l):
+                tags.append((3, l, i, f))
+            if is_form4(l):
+                tags.append((4, l, i, f))
             i = i + 1
     return tags
 
