@@ -1,38 +1,7 @@
 #!/usr/bin/env python3
 
-# -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-# generate a ctags compatible tags file for parable
-#
-# constraints:
-#
-# - code can be in either a *.p or *.md file
-#    - in *.p, everything is code
-#    - in *.md, code either has four spaces at the start of the line or
-#      is fenced with four backticks (````)
-# - syntax for naming a function is ... complicated
-#    - basic form:
-#      [ ... ] 'name' :
-#    - alternate form:
-#      'name' [ ... ] .
-#    - variable forms:
-#      'name' var
-#
-#      ... 'name' var!
-#
-#      [ 'name' 'name2' 'name3' ... ] ::
-#    - functions can span multiple source lines:
-#      'hello' [ "-s" \
-#          'hello world!' ] .
-# - tag file formats
-#   - classic ctags (for vim):
-#      tag  filename  line#
-#   - textmate requires:
-#      tag  filename  /^search_string$/;"  function  line:line#
-#   - replace the separators with a single tab
-
 import fnmatch
 import os
-
 
 def is_form1(l):
     flag = False
@@ -61,6 +30,23 @@ def is_form4(l):
     return flag
 
 
+def extract_tags(l, form):
+    tags = []
+    tokens = l.strip().split(' ')
+    if form == 1 or form == 3:
+        token = tokens[-2:][0:1][0]
+        tags.append(token[1:-1])
+        pass
+    elif form == 2:
+        pass
+    elif form == 4:
+        token = tokens[1:-2]
+        for t in token:
+            if t != '':
+                tags.append(t[1:-1])
+    return tags
+
+
 def get_tags_for(pat, textmate=False):
     tags = []
     matches = []
@@ -73,13 +59,13 @@ def get_tags_for(pat, textmate=False):
         i = 1
         for l in s:
             if is_form1(l):
-                tags.append((1, l, i, f))
+                tags.append((1, extract_tags(l, 1), i, f))
             if is_form2(l):
                 tags.append((2, l, i, f))
             if is_form3(l):
-                tags.append((3, l, i, f))
+                tags.append((3, extract_tags(l, 3), i, f))
             if is_form4(l):
-                tags.append((4, l, i, f))
+                tags.append((4, extract_tags(l, 4), i, f))
             i = i + 1
     return tags
 
