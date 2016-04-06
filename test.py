@@ -59,13 +59,17 @@ def get_tags_for(pat, textmate=False):
         i = 1
         for l in s:
             if is_form1(l):
-                tags.append((1, extract_tags(l, 1), i, f))
+                for tag in extract_tags(l, 1):
+                    tags.append((tag, f, i))
             if is_form2(l):
-                tags.append((2, l, i, f))
+                for tag in extract_tags(l, 2):
+                    tags.append((tag, f, i))
             if is_form3(l):
-                tags.append((3, extract_tags(l, 3), i, f))
+                for tag in extract_tags(l, 3):
+                    tags.append((tag, f, i))
             if is_form4(l):
-                tags.append((4, extract_tags(l, 4), i, f))
+                for tag in extract_tags(l, 4):
+                    tags.append((tag, f, i))
             i = i + 1
     return tags
 
