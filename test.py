@@ -36,9 +36,9 @@ def extract_tags(l, form):
     if form == 1 or form == 3:
         token = tokens[-2:][0:1][0]
         tags.append(token[1:-1])
-        pass
     elif form == 2:
-        pass
+        token = tokens[0:1][0]
+        tags.append(token[1:-1])
     elif form == 4:
         token = tokens[1:-2]
         for t in token:
@@ -71,12 +71,12 @@ def get_tags_for(pat, textmate=False):
                 for tag in extract_tags(l, 4):
                     tags.append((tag, f, i))
             i = i + 1
-    return tags
+    return sorted(tags)
 
 
 def write_tags(tagfile, textmate=False):
     tags = get_tags_for('*.p')
-    for l in sorted(tags):
+    for l in tags:
         print(l)
 
 
