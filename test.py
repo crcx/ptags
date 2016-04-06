@@ -3,36 +3,27 @@
 import fnmatch
 import os
 
-def is_form1(l):
-    flag = False
-    if l.endswith('\' :\n'):
-        flag = True
-    return flag
 
-def is_form2(l):
-    flag = False
-    if l.strip().startswith('\'') and l.endswith(' .\n'):
-        flag = True
-    return flag
+# form 0: not a definition
+# form 1: [ ... ] 'name' :
+# form 2: 'name' [ ... ] .
+# form 3: 'name' var   OR   'name' var!
+# form 4: [ 'name' 'name' ] ::
 
-def is_form3(l):
-    flag = False
-    if l.strip().startswith('\'') and l.endswith(' var\n'):
-        flag = True
-    if l.strip().startswith('\'') and l.endswith(' var!\n'):
-        flag = True
-    return flag
-
-def is_form4(l):
-    flag = False
-    if l.strip().startswith('[ \'') and l.endswith(' ::\n'):
-        flag = True
-    return flag
+def determine_form(src):
+    form = 0
+    line = src.strip()
+    if line.endswith('\' :'): form = 1
+    if line.startswith('\'') and line.endswith(' .'): form = 2
+    if line.startswith('\'') and line.endswith(' var'): form = 3
+    if line.startswith('\'') and line.endswith(' var!'): form = 3
+    if line.startswith('[ \'') and line.endswith(' ::'): form = 4
+    return form
 
 
-def extract_tags(l, form):
+def extract_tags(src, form):
     tags = []
-    tokens = l.strip().split(' ')
+    tokens = src.strip().split(' ')
     if form == 1 or form == 3:
         token = tokens[-2:][0:1][0]
         tags.append(token[1:-1])
@@ -54,23 +45,18 @@ def get_tags_for(pat, textmate=False):
         for filename in fnmatch.filter(filenames, pat):
             matches.append(os.path.join(root, filename))
     for f in matches:
+        words = []
         print('Scanning ' + f + '...')
         s = open(f, 'r').readlines()
         i = 1
         for l in s:
-            if is_form1(l):
-                for tag in extract_tags(l, 1):
-                    tags.append((tag, f, i))
-            if is_form2(l):
-                for tag in extract_tags(l, 2):
-                    tags.append((tag, f, i))
-            if is_form3(l):
-                for tag in extract_tags(l, 3):
-                    tags.append((tag, f, i))
-            if is_form4(l):
-                for tag in extract_tags(l, 4):
-                    tags.append((tag, f, i))
+            form = determine_form(l)
+            if form != 0:
+                for tag in extract_tags(l, form):
+                    words.append((tag, f, i))
             i = i + 1
+        print(' + ' + str(len(words)) + ' identified')
+        tags = tags + words
     return sorted(tags)
 
 
